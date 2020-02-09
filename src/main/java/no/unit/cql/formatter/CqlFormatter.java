@@ -4,7 +4,9 @@ import com.google.common.net.UrlEscapers;
 
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.nonNull;
 
@@ -23,7 +25,6 @@ public class CqlFormatter {
 
     private static final String SORT_BY = "sortBy";
     private static final String SORT_MODIFIER = "sort.descending";
-    public static final int ADD_EXTRA_YEAR_TO_INCLUDE_CURRENT_YEAR = 1;
     public static final int LAST_TWENTY_YEARS = 20;
     public static final String LOGICAL_AND = "AND";
     public static final String STRING_DELIMITER = "\"";
@@ -83,12 +84,12 @@ public class CqlFormatter {
     }
 
     private String generateDateClause() {
-        int currentYear = Year.now().getValue() + ADD_EXTRA_YEAR_TO_INCLUDE_CURRENT_YEAR;
+        int currentYear = Year.now().getValue();
         List<String> dateClauses = new ArrayList<>();
-        for (int years = LAST_TWENTY_YEARS; years > 0; years--) {
-            dateClauses.add(generateCqlClause(generateIndex(PUBLICATION_DATE), String.valueOf(currentYear - years)));
 
-        }
+        IntStream.range(0, LAST_TWENTY_YEARS).forEach(year -> dateClauses.add(generateCqlClause(generateIndex(PUBLICATION_DATE), String.valueOf(currentYear - year))));
+        Collections.reverse(dateClauses);
+
         return CLAUSE_DELIMITER_LEFT + String.join(String.join(LOGICAL_OR, CLAUSE_SEPARATOR, CLAUSE_SEPARATOR), dateClauses) + CLAUSE_DELIMITER_RIGHT;
     }
 
