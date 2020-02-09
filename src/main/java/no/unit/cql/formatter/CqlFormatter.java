@@ -59,8 +59,6 @@ public class CqlFormatter {
             clauses.add(generateDateClause());
         }
 
-        clauses.removeIf(String::isEmpty);
-
         String query = String.join(CLAUSE_SEPARATOR + LOGICAL_AND + CLAUSE_SEPARATOR, clauses);
 
         if (sorted) {
